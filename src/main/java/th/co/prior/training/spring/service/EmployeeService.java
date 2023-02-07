@@ -1,9 +1,12 @@
 package th.co.prior.training.spring.service;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import th.co.prior.training.spring.entity.EmployeeEntity;
+import th.co.prior.training.spring.model.EmployeeDepartmentModel;
 import th.co.prior.training.spring.model.EmployeeModel;
 import th.co.prior.training.spring.model.ResponseModel;
+import th.co.prior.training.spring.repository.EmployeeNativeRepository;
 import th.co.prior.training.spring.repository.EmployeeRepository;
 
 import java.util.ArrayList;
@@ -13,9 +16,12 @@ import java.util.List;
 public class EmployeeService {
 
     private EmployeeRepository employeeRepository;
+    private EmployeeNativeRepository employeeNativeRepository;
 
-    public EmployeeService(EmployeeRepository employeeRepository) {
+    public EmployeeService(EmployeeRepository employeeRepository
+            , @Qualifier(value = "employeeNativeRepository") EmployeeNativeRepository employeeNativeRepository) {
         this.employeeRepository = employeeRepository;
+        this.employeeNativeRepository = employeeNativeRepository;
     }
 
     public ResponseModel<List<EmployeeModel>> getEmployee(String firstName) {
@@ -40,6 +46,41 @@ public class EmployeeService {
             result.setCode("500");
             result.setDescription(e.getMessage());
         }
+        return result;
+    }
+
+    public ResponseModel<List<EmployeeDepartmentModel>> getEmployee2(String firstName) {
+        ResponseModel<List<EmployeeDepartmentModel>> result = new ResponseModel<>();
+        result.setCode("200");
+        result.setDescription("ok");
+
+        try {
+            List<EmployeeDepartmentModel> employeeEntityList
+                    = this.employeeNativeRepository.findEmployeeAndDepartment(firstName);
+            result.setData(employeeEntityList);
+        } catch (Exception e){
+            e.printStackTrace();
+            result.setCode("500");
+            result.setDescription(e.getMessage());
+        }
+        return result;
+    }
+
+    public ResponseModel<List<EmployeeDepartmentModel>> getEmployeeByCriteria(EmployeeDepartmentModel employeeDepartmentModel) {
+        ResponseModel<List<EmployeeDepartmentModel>> result = new ResponseModel<>();
+        result.setCode("200");
+        result.setDescription("ok");
+
+        try {
+            List<EmployeeDepartmentModel> employeeEntityList
+                    = this.employeeNativeRepository.findEmployeeAndDepartment(employeeDepartmentModel);
+            result.setData(employeeEntityList);
+        } catch (Exception e){
+            e.printStackTrace();
+            result.setCode("500");
+            result.setDescription(e.getMessage());
+        }
+
         return result;
     }
 }
