@@ -1,6 +1,8 @@
 package th.co.prior.training.spring.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import th.co.prior.training.spring.entity.InventoryEntity;
 import th.co.prior.training.spring.model.ErrorModel;
 import th.co.prior.training.spring.model.InventoryModel;
@@ -46,6 +48,7 @@ public class InventoryService {
     }
 
 
+
     public ResponseModel<InventoryModel> getInventory(Integer id) {
         ResponseModel<InventoryModel> result = new ResponseModel<>();
         result.setCode("200");
@@ -55,7 +58,10 @@ public class InventoryService {
 //            transform
             Optional<InventoryEntity> optionalInventoryEntity =  this.inventoryRepository.findById(id);
             if(optionalInventoryEntity.isPresent()){
+
                 InventoryEntity inventoryEntity = optionalInventoryEntity.get();
+                inventoryEntity.setIsDelete("Y");
+
                 InventoryModel data = this.inventoryUtilComponent.toModel(inventoryEntity);
                 result.setData(data);
             }
@@ -68,6 +74,7 @@ public class InventoryService {
         return result;
     }
 
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public ResponseModel<Void> insertBulkInventory(List<InventoryModel> inventoryModels) {
 
         ResponseModel<Void> result = new ResponseModel<>();
