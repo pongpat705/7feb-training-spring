@@ -1,8 +1,10 @@
 package th.co.prior.training.spring.controller.rest;
 
 import org.springframework.web.bind.annotation.*;
+import th.co.prior.training.spring.service.InventoryService;
 import th.co.prior.training.spring.model.EmployeeDepartmentModel;
 import th.co.prior.training.spring.model.EmployeeModel;
+import th.co.prior.training.spring.model.InventoryModel;
 import th.co.prior.training.spring.model.ResponseModel;
 import th.co.prior.training.spring.service.EmployeeService;
 
@@ -13,9 +15,11 @@ import java.util.List;
 public class AppRestController {
 
     private EmployeeService employeeeService;
+    private InventoryService inventoryService;
 
-    public AppRestController(EmployeeService employeeeService) {
+    public AppRestController(EmployeeService employeeeService, InventoryService inventoryService) {
         this.employeeeService = employeeeService;
+        this.inventoryService = inventoryService;
     }
 
     @GetMapping("/employee/{firstName}")
@@ -23,8 +27,29 @@ public class AppRestController {
         return this.employeeeService.getEmployee(firstName);
     }
 
-    @PostMapping("/employee")
+    @PostMapping("/inquiry/employee")
     public ResponseModel<List<EmployeeDepartmentModel>> getEmployee2(@RequestBody EmployeeDepartmentModel employeeDepartmentModel){
         return this.employeeeService.getEmployeeByCriteria(employeeDepartmentModel);
+    }
+
+    @PostMapping("/inventory")
+    public ResponseModel<Void> insert(
+            @RequestBody InventoryModel inventoryModel
+    ){
+        return this.inventoryService.insertInventory(inventoryModel);
+    }
+
+    @GetMapping("/inventory/{id}")
+    public ResponseModel<InventoryModel> getInventory(
+            @PathVariable Integer id
+    ){
+        return this.inventoryService.getInventory(id);
+    }
+
+    @PostMapping("/inventory/bulk")
+    public ResponseModel<Void> insertBulkInventory(
+            @RequestBody List<InventoryModel> inventoryModels
+    ){
+        return this.inventoryService.insertBulkInventory(inventoryModels);
     }
 }

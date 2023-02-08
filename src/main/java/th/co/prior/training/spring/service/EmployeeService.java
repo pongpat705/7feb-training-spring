@@ -19,7 +19,7 @@ public class EmployeeService {
     private EmployeeNativeRepository employeeNativeRepository;
 
     public EmployeeService(EmployeeRepository employeeRepository
-            , @Qualifier(value = "employeeNativeRepository") EmployeeNativeRepository employeeNativeRepository) {
+            , EmployeeNativeRepository employeeNativeRepository) {
         this.employeeRepository = employeeRepository;
         this.employeeNativeRepository = employeeNativeRepository;
     }

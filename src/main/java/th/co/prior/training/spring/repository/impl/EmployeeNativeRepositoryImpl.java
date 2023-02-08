@@ -12,7 +12,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-@Repository(value = "employeeNativeRepository")
+@Repository
 public class EmployeeNativeRepositoryImpl implements EmployeeNativeRepository {
 
     private JdbcTemplate jdbcTemplate;
