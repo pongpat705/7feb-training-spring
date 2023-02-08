@@ -74,7 +74,7 @@ public class InventoryService {
         return result;
     }
 
-    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+
     public ResponseModel<Void> insertBulkInventory(List<InventoryModel> inventoryModels) {
 
         ResponseModel<Void> result = new ResponseModel<>();
@@ -86,7 +86,7 @@ public class InventoryService {
             List<ErrorModel> errorModels = this.inventoryUtilComponent.validationInventoryModelList(inventoryModels);
 
             if(errorModels.size() == 0){
-                this.inventoryNativeRepository.insertBulkInventory(inventoryModels);
+               this.insertIntoInventory(inventoryModels);
             } else if(errorModels.size() > 0){
                 result.setCode("400");
                 result.setDescription("invalid input");
@@ -99,5 +99,11 @@ public class InventoryService {
             result.setDescription(e.getMessage());
         }
         return result;
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
+    public void insertIntoInventory(List<InventoryModel> inventoryModels) throws Exception {
+        this.inventoryNativeRepository.insertBulkInventory(inventoryModels);
+        throw new Exception("test");
     }
 }

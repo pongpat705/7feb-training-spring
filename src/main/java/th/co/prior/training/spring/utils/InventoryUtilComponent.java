@@ -47,7 +47,7 @@ public class InventoryUtilComponent {
                 errorModel.setDescription("item name is null");
                 errorModels.add(errorModel);
             }
-            if(null != x.getItemQty()){
+            if(null == x.getItemQty()){
                 ErrorModel errorModel = new ErrorModel();
                 errorModel.setCode("F001");
                 errorModel.setDescription("item qty is null");
