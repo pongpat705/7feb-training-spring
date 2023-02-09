@@ -1,8 +1,10 @@
 package th.co.prior.training.spring.service;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import th.co.prior.training.spring.entity.InventoryEntity;
 import th.co.prior.training.spring.model.ErrorModel;
 import th.co.prior.training.spring.model.InventoryModel;
@@ -11,6 +13,8 @@ import th.co.prior.training.spring.repository.InventoryNativeRepository;
 import th.co.prior.training.spring.repository.InventoryRepository;
 import th.co.prior.training.spring.utils.InventoryUtilComponent;
 
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,6 +33,7 @@ public class InventoryService {
         this.inventoryNativeRepository = inventoryNativeRepository;
     }
 
+    @Transactional
     public ResponseModel<Void> insertInventory(InventoryModel inventoryModel) {
         ResponseModel<Void> result = new ResponseModel<>();
         result.setCode("200");
@@ -38,15 +43,16 @@ public class InventoryService {
 //            transform
             InventoryEntity inventoryEntity =  this.inventoryUtilComponent.toEntity(inventoryModel);
             this.inventoryRepository.save(inventoryEntity);
+            this.inventoryRepository.save(new InventoryEntity());
 
         } catch (Exception e){
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             e.printStackTrace();
             result.setCode("500");
             result.setDescription(e.getMessage());
         }
         return result;
     }
-
 
 
     public ResponseModel<InventoryModel> getInventory(Integer id) {
@@ -73,8 +79,7 @@ public class InventoryService {
         }
         return result;
     }
-
-
+    @Transactional
     public ResponseModel<Void> insertBulkInventory(List<InventoryModel> inventoryModels) {
 
         ResponseModel<Void> result = new ResponseModel<>();
@@ -86,7 +91,12 @@ public class InventoryService {
             List<ErrorModel> errorModels = this.inventoryUtilComponent.validationInventoryModelList(inventoryModels);
 
             if(errorModels.size() == 0){
-               this.insertIntoInventory(inventoryModels);
+
+                this.inventoryNativeRepository.insertBulkInventory(inventoryModels);
+                List<InventoryModel> inventoryModelsB = new ArrayList<>();
+                inventoryModelsB.add(new InventoryModel());
+                this.inventoryNativeRepository.insertBulkInventory(inventoryModelsB);
+
             } else if(errorModels.size() > 0){
                 result.setCode("400");
                 result.setDescription("invalid input");
@@ -94,6 +104,7 @@ public class InventoryService {
             }
 
         } catch (Exception e){
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             e.printStackTrace();
             result.setCode("500");
             result.setDescription(e.getMessage());
@@ -101,9 +112,4 @@ public class InventoryService {
         return result;
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
-    public void insertIntoInventory(List<InventoryModel> inventoryModels) throws Exception {
-        this.inventoryNativeRepository.insertBulkInventory(inventoryModels);
-        throw new Exception("test");
-    }
 }
