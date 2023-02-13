@@ -8,5 +8,12 @@
 
 <h1 th:text="'Hello from spring boot!'+${name}"></h1>
 
+
+<form method="POST" action="/app/api/upload/file" enctype="multipart/form-data">
+    <input type="text" id="name" name="name">
+    <input type="file" id="file" name="file">
+    <button type="submit">send</button>
+</form>
+
 </body>
 </html>

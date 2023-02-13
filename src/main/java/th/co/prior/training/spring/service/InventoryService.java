@@ -1,19 +1,20 @@
 package th.co.prior.training.spring.service;
 
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
+import org.springframework.web.multipart.MultipartFile;
 import th.co.prior.training.spring.entity.InventoryEntity;
 import th.co.prior.training.spring.model.ErrorModel;
+import th.co.prior.training.spring.model.FileAndAttributeModel;
 import th.co.prior.training.spring.model.InventoryModel;
 import th.co.prior.training.spring.model.ResponseModel;
 import th.co.prior.training.spring.repository.InventoryNativeRepository;
 import th.co.prior.training.spring.repository.InventoryRepository;
 import th.co.prior.training.spring.utils.InventoryUtilComponent;
 
-import java.sql.SQLException;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -112,4 +113,35 @@ public class InventoryService {
         return result;
     }
 
+
+    @Transactional
+    public ResponseModel<Void> uploadFile(FileAndAttributeModel inventoryModels) {
+
+        ResponseModel<Void> result = new ResponseModel<>();
+        result.setCode("200");
+        result.setDescription("ok");
+
+        try {
+
+            MultipartFile multipartFile = inventoryModels.getFile();
+
+            File tmpFile = new File(
+                    "/home/pongpat/IdeaProjects/training/6feb/spring/tmp/"
+                            +inventoryModels.getName()+"_"+multipartFile.getOriginalFilename()
+            );
+
+            FileOutputStream fileOutputStream = new FileOutputStream(tmpFile);
+            fileOutputStream.write(multipartFile.getBytes());
+            fileOutputStream.flush();
+            fileOutputStream.close();
+
+//
+
+        } catch (Exception e){
+            e.printStackTrace();
+            result.setCode("500");
+            result.setDescription(e.getMessage());
+        }
+        return result;
+    }
 }

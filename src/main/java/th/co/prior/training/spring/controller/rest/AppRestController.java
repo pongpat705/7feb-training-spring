@@ -1,11 +1,8 @@
 package th.co.prior.training.spring.controller.rest;
 
 import org.springframework.web.bind.annotation.*;
+import th.co.prior.training.spring.model.*;
 import th.co.prior.training.spring.service.InventoryService;
-import th.co.prior.training.spring.model.EmployeeDepartmentModel;
-import th.co.prior.training.spring.model.EmployeeModel;
-import th.co.prior.training.spring.model.InventoryModel;
-import th.co.prior.training.spring.model.ResponseModel;
 import th.co.prior.training.spring.service.EmployeeService;
 
 import java.util.List;
@@ -39,6 +36,7 @@ public class AppRestController {
         return this.inventoryService.insertInventory(inventoryModel);
     }
 
+
     @GetMapping("/inventory/{id}")
     public ResponseModel<InventoryModel> getInventory(
             @PathVariable Integer id
@@ -51,5 +49,12 @@ public class AppRestController {
             @RequestBody List<InventoryModel> inventoryModels
     ){
         return this.inventoryService.insertBulkInventory(inventoryModels);
+    }
+
+    @PostMapping("/upload/file")
+    public ResponseModel<Void> uploadFile(
+            @ModelAttribute FileAndAttributeModel fileAndAttributeModel
+    ){
+        return this.inventoryService.uploadFile(fileAndAttributeModel);
     }
 }

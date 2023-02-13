@@ -1,13 +1,30 @@
 package th.co.prior.training.spring;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Test;
+import th.co.prior.training.spring.model.InventoryModel;
+
 class ApplicationTests {
 
+
 	@Test
-	void contextLoads() {
+	public void testJsonIgnoreProperties() throws JsonProcessingException {
+
+		String json = "{\n" +
+				"  \"itemName\":\"xxxx10\",\n" +
+				"  \"itemQty\": 50,\n" +
+				"  \"createDate\": \"08-02-2023 11:26:51\",\n" +
+				"  \"createBy\": \"test\",\n" +
+				"  \"isDelete\": \"N\",\n" +
+				"  \"employeeName\": \"test\"\n" +
+				"}";
+
+		ObjectMapper mapper = new ObjectMapper();
+
+		InventoryModel inventoryModel = mapper.readValue(json, InventoryModel.class);
+		System.out.println(inventoryModel.getInventoryId());
 	}
 
 }
