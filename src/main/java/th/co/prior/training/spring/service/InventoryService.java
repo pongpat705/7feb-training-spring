@@ -114,7 +114,7 @@ public class InventoryService {
     }
 
 
-    @Transactional
+
     public ResponseModel<Void> uploadFile(FileAndAttributeModel inventoryModels) {
 
         ResponseModel<Void> result = new ResponseModel<>();

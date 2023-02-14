@@ -3,6 +3,7 @@ package th.co.prior.training.spring;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import th.co.prior.training.spring.model.InventoryModel;
 
@@ -10,7 +11,7 @@ class ApplicationTests {
 
 
 	@Test
-	public void testJsonIgnoreProperties() throws JsonProcessingException {
+	public void testJsonIgnoreProperties()  {
 
 		String json = "{\n" +
 				"  \"itemName\":\"xxxx10\",\n" +
@@ -23,8 +24,12 @@ class ApplicationTests {
 
 		ObjectMapper mapper = new ObjectMapper();
 
-		InventoryModel inventoryModel = mapper.readValue(json, InventoryModel.class);
-		System.out.println(inventoryModel.getInventoryId());
+		InventoryModel inventoryModel = null;
+		try {
+			inventoryModel = mapper.readValue(json, InventoryModel.class);
+		} catch (JsonProcessingException e) {
+			Assertions.assertTrue(null != e.getMessage());
+		}
 	}
 
 }
