@@ -13,14 +13,14 @@ import java.time.LocalDateTime;
 public class BaseModel {
 
 
-    @JsonDeserialize(using = DateTimeDeserializer.class)
-    @JsonSerialize(using = DateTimeSerializer.class)
+//    @JsonDeserialize(using = DateTimeDeserializer.class)
+//    @JsonSerialize(using = DateTimeSerializer.class)
     @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
     private LocalDateTime createDate;
     private String createBy;
 
-    @JsonDeserialize(using = DateTimeDeserializer.class)
-    @JsonSerialize(using = DateTimeSerializer.class)
+//    @JsonDeserialize(using = DateTimeDeserializer.class)
+//    @JsonSerialize(using = DateTimeSerializer.class)
     @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
     private LocalDateTime updateDate;
     private String updateBy;

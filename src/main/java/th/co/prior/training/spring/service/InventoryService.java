@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.multipart.MultipartFile;
+import th.co.prior.training.spring.component.kafka.ProducerComponent;
 import th.co.prior.training.spring.entity.InventoryEntity;
 import th.co.prior.training.spring.model.ErrorModel;
 import th.co.prior.training.spring.model.FileAndAttributeModel;
@@ -25,13 +26,15 @@ public class InventoryService {
     private InventoryUtilComponent inventoryUtilComponent;
     private InventoryRepository inventoryRepository;
     private InventoryNativeRepository inventoryNativeRepository;
+    private ProducerComponent producerComponent;
 
     public InventoryService(InventoryUtilComponent inventoryUtilComponent
             , InventoryRepository inventoryRepository
-            , InventoryNativeRepository inventoryNativeRepository) {
+            , InventoryNativeRepository inventoryNativeRepository, ProducerComponent producerComponent1) {
         this.inventoryUtilComponent = inventoryUtilComponent;
         this.inventoryRepository = inventoryRepository;
         this.inventoryNativeRepository = inventoryNativeRepository;
+        this.producerComponent = producerComponent1;
     }
 
     @Transactional
@@ -136,6 +139,34 @@ public class InventoryService {
             fileOutputStream.close();
 
 //
+
+        } catch (Exception e){
+            e.printStackTrace();
+            result.setCode("500");
+            result.setDescription(e.getMessage());
+        }
+        return result;
+    }
+
+
+    public ResponseModel<Void> pushInventoryToKafka(Integer id) {
+        ResponseModel<Void> result = new ResponseModel<>();
+        result.setCode("200");
+        result.setDescription("push success");
+
+        try {
+//            transform
+            Optional<InventoryEntity> optionalInventoryEntity =  this.inventoryRepository.findById(id);
+            if(optionalInventoryEntity.isPresent()){
+
+                InventoryEntity inventoryEntity = optionalInventoryEntity.get();
+                inventoryEntity.setIsDelete("Y");
+
+                InventoryModel data = this.inventoryUtilComponent.toModel(inventoryEntity);
+
+                this.producerComponent.pushMessage(data,"test.event");
+
+            }
 
         } catch (Exception e){
             e.printStackTrace();

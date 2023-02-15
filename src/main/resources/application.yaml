@@ -16,3 +16,7 @@ logging:
   level:
     org.springframework.transaction.interceptor: TRACE
     org.springframework.transaction.support: DEBUG
+
+app:
+  kafka:
+    server: localhost:29092

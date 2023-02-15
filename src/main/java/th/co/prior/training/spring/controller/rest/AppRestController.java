@@ -57,4 +57,12 @@ public class AppRestController {
     ){
         return this.inventoryService.uploadFile(fileAndAttributeModel);
     }
+
+
+    @GetMapping("/push/inventory/{id}")
+    public ResponseModel<Void> pushInventory(
+            @PathVariable Integer id
+    ){
+        return this.inventoryService.pushInventoryToKafka(id);
+    }
 }
