@@ -30,11 +30,11 @@ public class InventoryService {
 
     public InventoryService(InventoryUtilComponent inventoryUtilComponent
             , InventoryRepository inventoryRepository
-            , InventoryNativeRepository inventoryNativeRepository, ProducerComponent producerComponent1) {
+            , InventoryNativeRepository inventoryNativeRepository, ProducerComponent producerComponent) {
         this.inventoryUtilComponent = inventoryUtilComponent;
         this.inventoryRepository = inventoryRepository;
         this.inventoryNativeRepository = inventoryNativeRepository;
-        this.producerComponent = producerComponent1;
+        this.producerComponent = producerComponent;
     }
 
     @Transactional
@@ -47,7 +47,6 @@ public class InventoryService {
 //            transform
             InventoryEntity inventoryEntity =  this.inventoryUtilComponent.toEntity(inventoryModel);
             this.inventoryRepository.save(inventoryEntity);
-            this.inventoryRepository.save(new InventoryEntity());
 
         } catch (Exception e){
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
@@ -91,15 +90,11 @@ public class InventoryService {
         result.setDescription("ok");
 
         try {
-//            validation
             List<ErrorModel> errorModels = this.inventoryUtilComponent.validationInventoryModelList(inventoryModels);
 
             if(errorModels.size() == 0){
 
                 this.inventoryNativeRepository.insertBulkInventory(inventoryModels);
-                List<InventoryModel> inventoryModelsB = new ArrayList<>();
-                inventoryModelsB.add(new InventoryModel());
-                this.inventoryNativeRepository.insertBulkInventory(inventoryModelsB);
 
             } else if(errorModels.size() > 0){
                 result.setCode("400");

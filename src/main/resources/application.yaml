@@ -9,13 +9,14 @@ spring:
   data:
     rest:
       base-path: /api/v2/
-server:
-  servlet:
-    context-path: /app
+  server:
+    servlet:
+      context-path: /app
 logging:
   level:
     org.springframework.transaction.interceptor: TRACE
     org.springframework.transaction.support: DEBUG
+    th.co.prior.training.spring: ERROR
 
 app:
   kafka:

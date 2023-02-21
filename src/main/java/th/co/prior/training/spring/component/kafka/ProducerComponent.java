@@ -28,6 +28,7 @@ public class ProducerComponent {
                 .completable()
                 .whenComplete((r, throwable) -> {
                     if(null == throwable){
+
                         log.info("kafka send to {} done {}"
                                 , r.getRecordMetadata().topic()
                                 , r.getProducerRecord().value());
