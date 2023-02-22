@@ -45,7 +45,7 @@ public class AppRestController {
     }
 
     @PostMapping("/inventory/bulk")
-    public ResponseModel<Void> insertBulkInventory(
+    public ResponseModel<Integer> insertBulkInventory(
             @RequestBody List<InventoryModel> inventoryModels
     ){
         return this.inventoryService.insertBulkInventory(inventoryModels);

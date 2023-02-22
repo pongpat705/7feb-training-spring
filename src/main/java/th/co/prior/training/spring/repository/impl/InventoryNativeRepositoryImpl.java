@@ -29,8 +29,6 @@ public class InventoryNativeRepositoryImpl implements InventoryNativeRepository 
         String sql = "INSERT into inventory(item_name,item_qty, create_date, create_by, is_delete) \n" +
                 " values\n" ;
 
-
-
         StringJoiner stringJoiner = new StringJoiner(",");
         for (InventoryModel inventoryModel: inventoryModelList) {
             stringJoiner.add("(?,?,?,?,?)");
@@ -42,9 +40,38 @@ public class InventoryNativeRepositoryImpl implements InventoryNativeRepository 
         }
         sql += stringJoiner.toString();
 
+        Connection connection = null;
 
+        int affectedRow = 0;
+        try {
+            connection = this.jdbcTemplate.getDataSource().getConnection();
+            connection.setAutoCommit(false);
 
-        return this.jdbcTemplate.update(sql, params.toArray());
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            for (int i = 0; i < params.size(); i++) {
+                preparedStatement.setObject(i+1, params.get(i));
+            }
+            affectedRow = preparedStatement.executeUpdate()
+            connection.commit();
+        } catch (Exception e){
+            if(null != connection){
+                try {
+                    connection.rollback();
+                } catch (SQLException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+        } finally {
+            if(null != connection){
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+
+        return affectedRow;
 
     }
 }

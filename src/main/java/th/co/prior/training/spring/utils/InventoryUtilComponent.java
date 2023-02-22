@@ -53,6 +53,12 @@ public class InventoryUtilComponent {
                 errorModel.setDescription("item qty is null");
                 errorModels.add(errorModel);
             }
+            if(null == x.getCreateBy()){
+                ErrorModel errorModel = new ErrorModel();
+                errorModel.setCode("F001");
+                errorModel.setDescription("create by is null");
+                errorModels.add(errorModel);
+            }
         }
 
         return errorModels;

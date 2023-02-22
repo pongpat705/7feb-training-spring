@@ -83,9 +83,9 @@ public class InventoryService {
         return result;
     }
     @Transactional
-    public ResponseModel<Void> insertBulkInventory(List<InventoryModel> inventoryModels) {
+    public ResponseModel<Integer> insertBulkInventory(List<InventoryModel> inventoryModels) {
 
-        ResponseModel<Void> result = new ResponseModel<>();
+        ResponseModel<Integer> result = new ResponseModel<>();
         result.setCode("200");
         result.setDescription("ok");
 
@@ -94,7 +94,8 @@ public class InventoryService {
 
             if(errorModels.size() == 0){
 
-                this.inventoryNativeRepository.insertBulkInventory(inventoryModels);
+                int affectedRow = this.inventoryNativeRepository.insertBulkInventory(inventoryModels);
+                result.setData(affectedRow);
 
             } else if(errorModels.size() > 0){
                 result.setCode("400");
@@ -107,6 +108,34 @@ public class InventoryService {
             e.printStackTrace();
             result.setCode("500");
             result.setDescription(e.getMessage());
+        }
+        return result;
+    }
+
+    @Transactional
+    public ResponseModel<Integer> getTotalQty() {
+
+        ResponseModel<Integer> result = new ResponseModel<>();
+        result.setCode("200");
+        result.setDescription("ok");
+
+        try {
+
+            List<InventoryEntity> inventoryEntities = this.inventoryRepository.findAll();
+            result.setData(this.sumAllInventory(inventoryEntities));
+
+        } catch (Exception e){
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            e.printStackTrace();
+            result.setCode("500");
+            result.setDescription(e.getMessage());
+        }
+        return result;
+    }
+    private int sumAllInventory(List<InventoryEntity> inventoryEntities){
+        int result = 0;
+        for (InventoryEntity x: inventoryEntities) {
+            result = result+x.getItemQty();
         }
         return result;
     }
