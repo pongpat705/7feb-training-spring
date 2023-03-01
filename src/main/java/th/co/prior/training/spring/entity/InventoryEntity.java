@@ -14,4 +14,5 @@ public class InventoryEntity extends BaseEntity{
     private Integer inventoryId;
     private String itemName;
     private Integer itemQty;
+
 }

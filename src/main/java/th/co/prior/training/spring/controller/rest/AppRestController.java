@@ -5,6 +5,7 @@ import th.co.prior.training.spring.model.*;
 import th.co.prior.training.spring.service.InventoryService;
 import th.co.prior.training.spring.service.EmployeeService;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 @RestController
@@ -44,6 +45,16 @@ public class AppRestController {
         return this.inventoryService.getInventory(id);
     }
 
+
+    @PostMapping("/inventory/update")
+    public ResponseModel<Void> updateInventory( @RequestHeader(name = "userLogin") String userLogin,
+            @RequestBody InventoryModel inventoryModel
+    ){
+        return this.inventoryService.updateInventory(inventoryModel, userLogin);
+    }
+
+
+
     @PostMapping("/inventory/bulk")
     public ResponseModel<Integer> insertBulkInventory(
             @RequestBody List<InventoryModel> inventoryModels
@@ -58,11 +69,23 @@ public class AppRestController {
         return this.inventoryService.uploadFile(fileAndAttributeModel);
     }
 
+    @GetMapping("/download/file")
+    public void downloadFile(HttpServletResponse response){
+        this.inventoryService.downloadFile(response);
+    }
+
 
     @GetMapping("/push/inventory/{id}")
-    public ResponseModel<Void> pushInventory(
+    public ResponseModel<Void> pushInventory(@RequestHeader(name = "userLogin") String userLogin,
             @PathVariable Integer id
     ){
-        return this.inventoryService.pushInventoryToKafka(id);
+        return this.inventoryService.pushInventoryToKafka(id, userLogin);
+    }
+
+    @GetMapping("/health/check")
+    public ResponseModel<Void> healthCheck(){
+        ResponseModel<Void> responseModel = new ResponseModel<>();
+        responseModel.setCode("200");
+        return responseModel;
     }
 }

@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: spring-configmap
+  namespace: sixfeb-dev
+data:
+  application.yaml: |+
+    spring:
+      datasource:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+      jpa:
+        show-sql: true
+      data:
+        rest:
+          base-path: /api/v2/
+    server:
+      servlet:
+        context-path: /spring
+    logging:
+      level:
+        org.springframework.transaction.interceptor: TRACE
+        org.springframework.transaction.support: DEBUG
+        th.co.prior.training.spring: ERROR
+    app:
+      kafka:
+        server: host.minikube.internal:39092
+  mytestfile.txt: |+
+    hello my friend
+    

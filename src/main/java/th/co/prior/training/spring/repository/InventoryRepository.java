@@ -9,5 +9,5 @@ import java.util.Optional;
 @Repository
 public interface InventoryRepository extends JpaRepository<InventoryEntity, Integer> {
 
-
+    Optional<InventoryEntity> findByInventoryIdAndIsDelete(Integer inventoryId, String isDeleted);
 }

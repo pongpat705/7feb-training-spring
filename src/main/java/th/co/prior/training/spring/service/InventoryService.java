@@ -1,5 +1,7 @@
 package th.co.prior.training.spring.service;
 
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
@@ -14,13 +16,18 @@ import th.co.prior.training.spring.repository.InventoryNativeRepository;
 import th.co.prior.training.spring.repository.InventoryRepository;
 import th.co.prior.training.spring.utils.InventoryUtilComponent;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.util.ArrayList;
+import java.io.OutputStream;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@Slf4j
 public class InventoryService {
 
     private InventoryUtilComponent inventoryUtilComponent;
@@ -149,6 +156,7 @@ public class InventoryService {
         result.setDescription("ok");
 
         try {
+            log.info(inventoryModels.toString());
 
             MultipartFile multipartFile = inventoryModels.getFile();
 
@@ -173,11 +181,39 @@ public class InventoryService {
     }
 
 
-    public ResponseModel<Void> pushInventoryToKafka(Integer id) {
+    public void downloadFile(HttpServletResponse httpServletResponse) {
+        try {
+            File tmpFile = new File("/home/app/boarding-passes-DZH2M2.pdf");
+            FileInputStream fileInputStream = new FileInputStream(tmpFile);
+            httpServletResponse.setContentType("application/octet-stream");
+            httpServletResponse.setStatus(HttpServletResponse.SC_OK);
+            httpServletResponse.setHeader("Content-Disposition"
+                    , "attachment; filename=" + "pdf"+ new Date().getTime()+".pdf");
+            OutputStream outputStream = httpServletResponse.getOutputStream();
+            outputStream.write(fileInputStream.readAllBytes());
+            outputStream.flush();
+            outputStream.close();
+        } catch (Exception e){
+            e.printStackTrace();
+            String result = "{\"result\":\""+e.getMessage()+"\"}";
+            try {
+                httpServletResponse.setContentType("application/json");
+                OutputStream outputStream = httpServletResponse.getOutputStream();
+                outputStream.write(result.getBytes());
+                outputStream.flush();
+                outputStream.close();
+            } catch (Exception ex){
+                ex.printStackTrace();
+            }
+        }
+    }
+
+    public ResponseModel<Void> pushInventoryToKafka(Integer id, String userLogin) {
         ResponseModel<Void> result = new ResponseModel<>();
         result.setCode("200");
         result.setDescription("push success");
 
+        log.info("user {} pushing a message", userLogin);
         try {
 //            transform
             Optional<InventoryEntity> optionalInventoryEntity =  this.inventoryRepository.findById(id);
@@ -193,6 +229,49 @@ public class InventoryService {
             }
 
         } catch (Exception e){
+            e.printStackTrace();
+            result.setCode("500");
+            result.setDescription(e.getMessage());
+        }
+        return result;
+    }
+
+    public ResponseModel<Void> updateInventory(InventoryModel inventoryModel, String userLogin) {
+        ResponseModel<Void> result = new ResponseModel<>();
+        result.setCode("200");
+        result.setDescription("update success");
+
+        log.info("user {} update success", userLogin);
+        try {
+//            transform
+//            validate
+            boolean isValid = true;
+            if (null == inventoryModel.getItemQty()) {
+                result.setCode("400");
+                result.setDescription("item qty is null");
+                isValid = false;
+            }
+            if (isValid) {
+                Optional<InventoryEntity> optionalInventoryEntity = this.inventoryRepository.findByInventoryIdAndIsDelete(inventoryModel.getInventoryId(), "N");
+                if (optionalInventoryEntity.isPresent()) {
+
+                    InventoryEntity inventoryEntity = optionalInventoryEntity.get();
+                    inventoryEntity.setItemName(inventoryModel.getItemName());
+                    inventoryEntity.setItemQty(inventoryModel.getItemQty());
+
+                    inventoryEntity.setUpdateDate(LocalDateTime.now());
+                    inventoryEntity.setUpdateBy(userLogin);
+
+                    this.inventoryRepository.save(inventoryEntity);
+
+                } else {
+                    result.setCode("404");
+                    result.setDescription("กูหาไม่เจอ");
+                }
+            }
+
+
+        } catch (Exception e) {
             e.printStackTrace();
             result.setCode("500");
             result.setDescription(e.getMessage());

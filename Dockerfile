@@ -10,4 +10,4 @@ WORKDIR /home/app
 
 EXPOSE 8080
 
-ENTRYPOINT exec java -jar /home/app/app.jar --spring.config.location=/home/app/config/application.yaml
+ENTRYPOINT exec java $JAVA_OPTS -jar /home/app/app.jar --spring.config.location=$SPRING_CONFIG

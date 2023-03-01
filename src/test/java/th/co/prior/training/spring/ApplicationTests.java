@@ -1,6 +1,7 @@
 package th.co.prior.training.spring;
 
 
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -108,6 +109,9 @@ class ApplicationTests {
 
 				result.add(a);
 				result.add(b);
+
+
+
 				return result;
 			}
 

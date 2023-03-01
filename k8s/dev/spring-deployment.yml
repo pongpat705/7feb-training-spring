@@ -1,0 +1,79 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spring-deployment
+  namespace: sixfeb-dev
+  labels:
+    app: spring-label
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: spring-deployment
+  template:
+    metadata:
+      labels:
+        app: spring-deployment
+    spec:
+      hostAliases:
+        - ip: 127.0.0.1
+          hostnames:
+            - localhost
+      containers:
+      - name: spring-deployment
+        image: producerapp:1.0
+        imagePullPolicy: Never
+        ports:
+          - name: http
+            containerPort: 8080
+            protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /spring/api/health/check
+            port: http
+          failureThreshold: 3
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /spring/api/health/check
+            port: http
+          failureThreshold: 3
+          periodSeconds: 30
+        env:
+        - name: JAVA_OPTS
+          value: "-Xms256m -Xmx1024m"
+        - name: SPRING_CONFIG
+          value: "/home/app/config/application.yaml"
+        - name: TIME_ZONE
+          value: "-Dlogback.timezone=Asia/Bangkok"
+        - name: SPRING_DATASOURCE_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: spring-secret
+              key: spring.datasource.username
+        - name: SPRING_DATASOURCE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: spring-secret
+              key: spring.datasource.password
+        - name: SPRING_DATASOURCE_URL
+          valueFrom:
+            secretKeyRef:
+              name: spring-secret
+              key: spring.datasource.url
+        - name: MY_POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        volumeMounts:
+        - name: spring-volume
+          mountPath: /home/app/config/application.yaml
+          subPath: application.yaml
+        - name: spring-volume
+          mountPath: /home/app/config/mytestfile.txt
+          subPath: mytestfile.txt
+      volumes:
+      - name: spring-volume
+        configMap:
+          name: spring-configmap
+
