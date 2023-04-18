@@ -4,6 +4,8 @@ spring:
     password: password
     url: jdbc:mysql://localhost:3307/employees
     driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 2
   jpa:
     show-sql: true
   data:
@@ -12,7 +14,9 @@ spring:
 logging:
   level:
     org.springframework.transaction.interceptor: TRACE
-    org.springframework.transaction.support: DEBUG
+    org.springframework.transaction.support: TRACE
+    com.zaxxer.hikari.HikariConfig: TRACE
+    com.zaxxer.hikari: TRACE
     th.co.prior.training.spring: ERROR
 
 app:
@@ -20,4 +24,5 @@ app:
     server: localhost:29092
 server:
   servlet:
-    context-path: /spring
+    context-path: /app
+  port: 8080

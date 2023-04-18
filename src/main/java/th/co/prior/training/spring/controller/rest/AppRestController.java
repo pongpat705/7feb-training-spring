@@ -74,6 +74,11 @@ public class AppRestController {
         this.inventoryService.downloadFile(response);
     }
 
+    @GetMapping("/download/file/excel")
+    public void downloadFileExcel(HttpServletResponse response){
+        this.inventoryService.downloadFileExcel(response);
+    }
+
 
     @GetMapping("/push/inventory/{id}")
     public ResponseModel<Void> pushInventory(@RequestHeader(name = "userLogin") String userLogin,
